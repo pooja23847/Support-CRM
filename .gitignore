@@ -1,0 +1,1 @@
+Set-Content -Path .gitignore -Value "venv/`n__pycache__/`n*.pyc`n.env`nsupport_crm.db`n.DS_Store"git rm -r --cached venv
