@@ -12,15 +12,27 @@ def get_db_connection():
 
 
 def init_db():
-    """Creates the tickets and notes tables if they don't already exist.
+    """Creates the companies, tickets, and notes tables if they don't already exist.
     Called once when the app starts."""
     conn = get_db_connection()
     cursor = conn.cursor()
+
+    # Each company = one tenant. Their employees share this one login.
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS companies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            company_name TEXT NOT NULL,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             ticket_id TEXT UNIQUE NOT NULL,
+            company_id INTEGER NOT NULL,
             customer_name TEXT NOT NULL,
             customer_email TEXT NOT NULL,
             subject TEXT NOT NULL,
@@ -28,7 +40,8 @@ def init_db():
             status TEXT NOT NULL DEFAULT 'Open',
             priority TEXT NOT NULL DEFAULT 'Medium',
             created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (company_id) REFERENCES companies (id)
         )
     """)
 
@@ -47,9 +60,10 @@ def init_db():
 
 
 def generate_ticket_id(conn):
-    """Looks at how many tickets exist and generates the next ID: TKT-001, TKT-002, ..."""
+    """Generates the next ticket ID, globally unique across ALL companies
+    (since ticket_id has a UNIQUE constraint on the whole table)."""
     cursor = conn.cursor()
     cursor.execute("SELECT COUNT(*) as count FROM tickets")
     count = cursor.fetchone()["count"]
     next_number = count + 1
-    return f"TKT-{next_number:03d}"   # :03d pads with zeros -> 001, 002, ... 010, 011
+    return f"TKT-{next_number:03d}"

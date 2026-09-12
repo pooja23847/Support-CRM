@@ -1,5 +1,5 @@
 // ---------- Helpers ----------
-console.log("SCRIPT LOADED");
+
 function statusColor(status) {
   if (status === "Open") return "bg-yellow-100 text-yellow-800";
   if (status === "In Progress") return "bg-blue-100 text-blue-800";
@@ -16,6 +16,69 @@ function priorityColor(priority) {
 function formatDate(isoString) {
   const d = new Date(isoString);
   return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
+// ---------- SIGNUP PAGE ----------
+
+const signupForm = document.getElementById("signupForm");
+if (signupForm) {
+  signupForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const payload = {
+      company_name: document.getElementById("company_name").value,
+      username: document.getElementById("username").value,
+      password: document.getElementById("password").value,
+    };
+
+    const res = await fetch("/api/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const errorBox = document.getElementById("signupError");
+      errorBox.textContent = data.error || "Something went wrong.";
+      errorBox.classList.remove("hidden");
+      return;
+    }
+
+    window.location.href = "/";
+  });
+}
+
+// ---------- LOGIN PAGE ----------
+
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const payload = {
+      username: document.getElementById("username").value,
+      password: document.getElementById("password").value,
+    };
+
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const errorBox = document.getElementById("loginError");
+      errorBox.textContent = data.error || "Something went wrong.";
+      errorBox.classList.remove("hidden");
+      return;
+    }
+
+    window.location.href = "/";
+  });
 }
 
 // ---------- HOME PAGE: load + search + filter tickets ----------
@@ -43,19 +106,19 @@ async function loadTickets() {
   emptyMessage.classList.add("hidden");
 
   tableBody.innerHTML = tickets.map(t => `
-  <tr class="border-t hover:bg-gray-50 cursor-pointer" onclick="window.location.href='/tickets/${t.ticket_id}'">
-    <td class="px-4 py-3 font-medium text-gray-700">${t.ticket_id}</td>
-    <td class="px-4 py-3">${t.customer_name}</td>
-    <td class="px-4 py-3">${t.subject}</td>
-    <td class="px-4 py-3">
-      <span class="text-xs px-2 py-1 rounded-full ${priorityColor(t.priority)}">${t.priority}</span>
-    </td>
-    <td class="px-4 py-3">
-      <span class="text-xs px-2 py-1 rounded-full ${statusColor(t.status)}">${t.status}</span>
-    </td>
-    <td class="px-4 py-3 text-gray-500 text-sm">${formatDate(t.created_at)}</td>
-  </tr>
-`).join("");
+    <tr class="border-t hover:bg-gray-50 cursor-pointer" onclick="window.location.href='/tickets/${t.ticket_id}'">
+      <td class="px-4 py-3 font-medium text-gray-700">${t.ticket_id}</td>
+      <td class="px-4 py-3">${t.customer_name}</td>
+      <td class="px-4 py-3">${t.subject}</td>
+      <td class="px-4 py-3">
+        <span class="text-xs px-2 py-1 rounded-full ${priorityColor(t.priority)}">${t.priority}</span>
+      </td>
+      <td class="px-4 py-3">
+        <span class="text-xs px-2 py-1 rounded-full ${statusColor(t.status)}">${t.status}</span>
+      </td>
+      <td class="px-4 py-3 text-gray-500 text-sm">${formatDate(t.created_at)}</td>
+    </tr>
+  `).join("");
 }
 
 const searchBox = document.getElementById("searchBox");
@@ -101,7 +164,7 @@ if (createForm) {
   });
 }
 
-// ---------- DETAIL PAGE: load ticket + handle status/notes update ----------
+// ---------- DETAIL PAGE: load ticket + handle status/priority/notes update ----------
 
 const ticketDetailDiv = document.getElementById("ticketDetail");
 if (ticketDetailDiv) {
@@ -136,7 +199,10 @@ async function loadTicketDetail(ticketId) {
           <h1 class="text-xl font-bold text-gray-800">${t.subject}</h1>
           <p class="text-sm text-gray-500">${t.ticket_id}</p>
         </div>
-        <span class="text-xs px-2 py-1 rounded-full ${statusColor(t.status)}">${t.status}</span>
+        <div class="flex gap-2">
+          <span class="text-xs px-2 py-1 rounded-full ${priorityColor(t.priority)}">${t.priority}</span>
+          <span class="text-xs px-2 py-1 rounded-full ${statusColor(t.status)}">${t.status}</span>
+        </div>
       </div>
 
       <p class="text-sm text-gray-600 mb-1"><strong>Customer:</strong> ${t.customer_name} (${t.customer_email})</p>
@@ -175,16 +241,14 @@ async function loadTicketDetail(ticketId) {
 
   document.getElementById("updateBtn").addEventListener("click", async function () {
     const status = document.getElementById("statusSelect").value;
-    const notes = document.getElementById("noteText").value;
     const priority = document.getElementById("prioritySelect").value;
+    const notes = document.getElementById("noteText").value;
 
     await fetch(`/api/tickets/${ticketId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status, notes, priority }),
     });
-
-    
 
     loadTicketDetail(ticketId); // reload to show the update
   });

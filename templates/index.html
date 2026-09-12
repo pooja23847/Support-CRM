@@ -10,10 +10,18 @@
 
   <div class="max-w-5xl mx-auto p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Support Tickets</h1>
-      <a href="/create" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-        + New Ticket
-      </a>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800">Support Tickets</h1>
+        <p class="text-sm text-gray-500">{{ company_name }}</p>
+      </div>
+      <div class="flex gap-3">
+        <a href="/create" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          + New Ticket
+        </a>
+        <a href="/logout" class="text-gray-500 px-4 py-2 hover:text-gray-700">
+          Logout
+        </a>
+      </div>
     </div>
 
     <!-- Search + Filter -->
@@ -40,6 +48,7 @@
             <th class="px-4 py-3">Ticket ID</th>
             <th class="px-4 py-3">Customer</th>
             <th class="px-4 py-3">Subject</th>
+            <th class="px-4 py-3">Priority</th>
             <th class="px-4 py-3">Status</th>
             <th class="px-4 py-3">Date</th>
           </tr>
