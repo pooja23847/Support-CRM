@@ -31,7 +31,7 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            ticket_id TEXT UNIQUE NOT NULL,
+            ticket_id TEXT NOT NULL,
             company_id INTEGER NOT NULL,
             customer_name TEXT NOT NULL,
             customer_email TEXT NOT NULL,
@@ -41,7 +41,8 @@ def init_db():
             priority TEXT NOT NULL DEFAULT 'Medium',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
-            FOREIGN KEY (company_id) REFERENCES companies (id)
+            FOREIGN KEY (company_id) REFERENCES companies (id),
+            UNIQUE (company_id, ticket_id)
         )
     """)
 
@@ -59,11 +60,12 @@ def init_db():
     conn.close()
 
 
-def generate_ticket_id(conn):
-    """Generates the next ticket ID, globally unique across ALL companies
-    (since ticket_id has a UNIQUE constraint on the whole table)."""
+def generate_ticket_id(conn, company_id):
+    """Generates the next ticket ID *within this company* — each company gets
+    its own TKT-001, TKT-002, ... sequence. Safe now because the UNIQUE
+    constraint is on (company_id, ticket_id) together, not ticket_id alone."""
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) as count FROM tickets")
+    cursor.execute("SELECT COUNT(*) as count FROM tickets WHERE company_id = ?", (company_id,))
     count = cursor.fetchone()["count"]
     next_number = count + 1
     return f"TKT-{next_number:03d}"

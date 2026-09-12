@@ -146,7 +146,7 @@ def create_ticket():
     priority = data.get("priority", "Medium")
 
     conn = get_db_connection()
-    ticket_id = generate_ticket_id(conn)
+    ticket_id = generate_ticket_id(conn, company_id)
     now = datetime.now().isoformat()
 
     conn.execute("""
