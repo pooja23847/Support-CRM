@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticket Detail — Support CRM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="max-w-2xl mx-auto p-6">
+    <a href="/" class="text-blue-600 text-sm">&larr; Back to tickets</a>
+
+    <!-- data-ticket-id lets script.js know which ticket to fetch -->
+    <div id="ticketDetail" data-ticket-id="{{ ticket_id }}" class="mt-4">
+      <p class="text-gray-400">Loading ticket...</p>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

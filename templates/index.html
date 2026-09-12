@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support CRM — Tickets</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="max-w-5xl mx-auto p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Support Tickets</h1>
+      <a href="/create" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        + New Ticket
+      </a>
+    </div>
+
+    <!-- Search + Filter -->
+    <div class="flex gap-3 mb-4">
+      <input
+        type="text"
+        id="searchBox"
+        placeholder="Search by name, email, ID, or description..."
+        class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+      <select id="statusFilter" class="border border-gray-300 rounded-lg px-4 py-2">
+        <option value="">All Status</option>
+        <option value="Open">Open</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Closed">Closed</option>
+      </select>
+    </div>
+
+    <!-- Ticket table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <table class="w-full text-left">
+        <thead class="bg-gray-100 text-gray-600 text-sm">
+          <tr>
+            <th class="px-4 py-3">Ticket ID</th>
+            <th class="px-4 py-3">Customer</th>
+            <th class="px-4 py-3">Subject</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Date</th>
+          </tr>
+        </thead>
+        <tbody id="ticketTableBody">
+          <!-- filled in by script.js -->
+        </tbody>
+      </table>
+      <p id="emptyMessage" class="text-center text-gray-400 py-8 hidden">No tickets found.</p>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
